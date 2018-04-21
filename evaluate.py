@@ -1,5 +1,5 @@
 from time import time
-from classifier_mnb import train, classify  # classifier.py should be in the same directory
+from NaiveBayes/classifier_mnb import train, classify  # classifier.py should be in the same directory
 from score import load_dataset_fast, score, save_preds, score_preds
 import numpy as np
 
