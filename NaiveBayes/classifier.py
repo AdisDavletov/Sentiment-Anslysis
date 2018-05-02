@@ -97,8 +97,8 @@ def train(texts, labels, mode = "bernoulli"):
         primaryVocabSize   = 70000
         secondaryVocabSize = 10200
     else:
-        primaryVocabSize   = 26000
-        secondaryVocabSize = 2700
+        primaryVocabSize   = 27000
+        secondaryVocabSize = 3000
 
     texts = initTexts(texts)
     big_vocab = makeVocabulary(texts)
