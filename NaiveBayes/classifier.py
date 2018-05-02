@@ -65,7 +65,7 @@ def calculateProbabilitiesMnb(texts, wordsMap, alpha = 1):
             try:
                 idx = wordsMap[word]
                 number_of_words += 1
-                tmp[idx] += 1
+                tmp[idx] = 1
             except KeyError:
                 tmp[vocabSize - 1] += 1
                 continue
