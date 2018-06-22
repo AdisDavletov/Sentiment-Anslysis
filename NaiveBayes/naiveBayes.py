@@ -74,9 +74,13 @@ def calculateProbabilitiesMnb(texts, wordsMap, alpha = 1):
     wordsProbs /= (number_of_words + vocabSize * alpha)
     return wordsProbs
 
-def initTexts(texts):
-    texts = [tokenizer(string) for string in texts]
-    texts = [unigrams + addNGrams(unigrams, 2) for unigrams in texts]
+def initTexts(texts, maxNGramSize = 2):
+    texts = [tokenizer(text) for text in texts]
+    for i in range(len(texts)):
+        nGrams = []
+        for j in range(maxNGramSize - 1):
+            nGrams += addNGrams(texts[i], j + 2)
+        texts[i] += nGrams
     return texts
 
 def makeVocabulary(texts):
@@ -92,15 +96,8 @@ def makeWordsMap(uniqueWords):
         wordsMap[uniqueWords[i]] = i
     return wordsMap
 
-def train(texts, labels, mode = "bernoulli"):
-    if mode == 'bernoulli':
-        primaryVocabSize   = 70000
-        secondaryVocabSize = 10200
-    else:
-        primaryVocabSize   = 27000
-        secondaryVocabSize = 3000
-
-    texts = initTexts(texts)
+def train(texts, labels, primaryVocabSize = 100000, secondaryVocabSize = 10000, mode = "bernoulli", maxNGramSize = 1):
+    texts = initTexts(texts, maxNGramSize = maxNGramSize)
     big_vocab = makeVocabulary(texts)
     uniqueWords = np.array(sorted(big_vocab, key = big_vocab.get, reverse = True)[:primaryVocabSize] + ['UNK'])    
     wordsMap = makeWordsMap(uniqueWords)
@@ -137,17 +134,20 @@ def train(texts, labels, mode = "bernoulli"):
     params['posClassProb'] = posClassProb
     params['negClassProb'] = negClassProb
     params['wordsMap'] = wordsMap
+    params['maxNGramSize'] = maxNGramSize
+    params['mode'] = mode
     return params
 
-def classify(texts, params, mode = "bernoulli"):
-    texts = initTexts(texts)
+def classify(texts, params):
     posProbs = params['pos']
     negProbs = params['neg']
     posClassProb = params['posClassProb']
     negClassProb = params['negClassProb']
     wordsMap = params['wordsMap']
+    maxNGramSize = params['maxNGramSize']
+    mode = params['mode']
     vocabSize = len(wordsMap)
-
+    texts = initTexts(texts, maxNGramSize = maxNGramSize)
     if mode == "bernoulli":
         labels = classifyBnb(posProbs, negProbs, posClassProb, negClassProb, wordsMap, texts)
     else:
